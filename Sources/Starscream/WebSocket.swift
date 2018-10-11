@@ -361,7 +361,6 @@ open class WebSocket : NSObject, StreamDelegate, WebSocketClient, WSStreamDelega
     let headerWSProtocolName    = "Sec-WebSocket-Protocol"
     let headerWSVersionName     = "Sec-WebSocket-Version"
     let headerWSVersionValue    = "13"
-    let headerWSExtensionName   = "Sec-WebSocket-Extensions"
     let headerWSKeyName         = "Sec-WebSocket-Key"
     let headerOriginName        = "Origin"
     let headerWSAcceptName      = "Sec-WebSocket-Accept"
@@ -593,10 +592,6 @@ open class WebSocket : NSObject, StreamDelegate, WebSocketClient, WSStreamDelega
         request.setValue(headerWSVersionValue, forHTTPHeaderField: headerWSVersionName)
         request.setValue(headerSecKey, forHTTPHeaderField: headerWSKeyName)
         
-        if enableCompression {
-            let val = "permessage-deflate; client_max_window_bits; server_max_window_bits=15"
-            request.setValue(val, forHTTPHeaderField: headerWSExtensionName)
-        }
         let hostValue = request.allHTTPHeaderFields?[headerWSHostName] ?? "\(url.host!):\(port!)"
         request.setValue(hostValue, forHTTPHeaderField: headerWSHostName)
 
@@ -880,10 +875,6 @@ open class WebSocket : NSObject, StreamDelegate, WebSocketClient, WSStreamDelega
         onHttpResponseHeaders?(headers)
         if code != httpSwitchProtocolCode {
             return code
-        }
-        
-        if let extensionHeader = headers[headerWSExtensionName.lowercased()] {
-            processExtensionHeader(extensionHeader)
         }
         
         if let acceptKey = headers[headerWSAcceptName.lowercased()] {
